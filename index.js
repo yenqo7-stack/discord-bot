@@ -181,7 +181,6 @@ client.on('interactionCreate', async (interaction) => {
         }
       }
 
-      // ✅ Fix: flags statt ephemeral: true
       await interaction.reply({
         content: '✅ Du wurdest erfolgreich verifiziert!',
         flags: MessageFlags.Ephemeral
@@ -206,7 +205,7 @@ client.on('interactionCreate', async (interaction) => {
     await interaction.reply({
       content: '**Vorschau der Willkommensnachricht:**',
       embeds: [embed],
-      flags: MessageFlags.Ephemeral   // ✅ Fix: flags statt ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -214,7 +213,7 @@ client.on('interactionCreate', async (interaction) => {
     if (!interaction.member.permissions.has('Administrator')) {
       return interaction.reply({
         content: '❌ Keine Berechtigung.',
-        flags: MessageFlags.Ephemeral  // ✅ Fix
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -224,19 +223,18 @@ client.on('interactionCreate', async (interaction) => {
     if (!channel) {
       return interaction.reply({
         content: '❌ Verify-Kanal nicht gefunden. Prüfe VERIFY_CHANNEL_ID.',
-        flags: MessageFlags.Ephemeral  // ✅ Fix
+        flags: MessageFlags.Ephemeral
       });
     }
 
     await sendeVerifyNachricht(channel);
     await interaction.reply({
       content: `✅ Verify-Nachricht wurde in <#${channel.id}> gesendet.`,
-      flags: MessageFlags.Ephemeral    // ✅ Fix
+      flags: MessageFlags.Ephemeral
     });
   }
 });
 
-// ✅ Fix: clientReady statt ready
 client.once('clientReady', async () => {
   console.log(`\n🤖 Bot ist online als ${client.user.tag}`);
   await registerCommands();
