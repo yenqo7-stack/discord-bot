@@ -4,7 +4,11 @@ const TOKEN = process.env.TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const WELCOME_CHANNEL_ID = process.env.WELCOME_CHANNEL_ID;
 const SERVER_NAME = process.env.SERVER_NAME || 'Dein Server';
-const WELCOME_FARBE = '#5865F2';
+
+// Dein Banner-Link hier eintragen (direkt-link zu deinem Bild, z.B. von Imgur oder Discord CDN)
+const BANNER_URL = process.env.BANNER_URL || 'https://i.imgur.com/DEIN_BANNER.png';
+
+const WELCOME_FARBE = '#9B59B6'; // Lila passend zum Studio-Style
 
 const client = new Client({
   intents: [
@@ -24,25 +28,32 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 async function registerCommands() {
   try {
-    console.log('📋 Slash Commands werden registriert...');
+    console.log('Slash Commands werden registriert...');
     await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
-    console.log('✅ Slash Commands registriert!');
+    console.log('Slash Commands registriert!');
   } catch (error) {
-    console.error('❌ Fehler:', error);
+    console.error('Fehler:', error);
   }
 }
 
 function erstelleWillkommensEmbed(user) {
   return new EmbedBuilder()
     .setColor(WELCOME_FARBE)
-    .setTitle(`👋 Willkommen auf ${SERVER_NAME}!`)
-    .setDescription(`Hey ${user}, schön dass du da bist! 🎉\n\nSchau dich gerne um und hab Spaß!`)
-    .setThumbnail(user.displayAvatarURL({ dynamic: true }))
-    .addFields(
-      { name: '📜 Regeln', value: 'Lies dir bitte die Regeln durch!', inline: true },
-      { name: '🎮 Viel Spaß', value: 'Genieße deinen Aufenthalt!', inline: true }
+    .setImage(BANNER_URL)
+    .setThumbnail(user.displayAvatarURL({ dynamic: true, size: 256 }))
+    .setTitle(`Willkommen auf ${SERVER_NAME}`)
+    .setDescription(
+      `**${user}** ist dem Server beigetreten.\n\n` +
+      `Schau dir die Regeln durch und genieß deinen Aufenthalt.`
     )
-    .setFooter({ text: `Willkommen auf ${SERVER_NAME}!` })
+    .addFields(
+      { name: 'Regeln', value: 'Lies die Serverregeln durch', inline: true },
+      { name: 'Support', value: 'Offne ein Ticket bei Fragen', inline: true }
+    )
+    .setFooter({
+      text: `${SERVER_NAME} • Mitglied #${user.client.guilds.cache.first()?.memberCount ?? '?'}`,
+      iconURL: user.displayAvatarURL({ dynamic: true })
+    })
     .setTimestamp();
 }
 
@@ -58,7 +69,7 @@ client.on('interactionCreate', async (interaction) => {
   if (interaction.commandName === 'testw') {
     const embed = erstelleWillkommensEmbed(interaction.user);
     await interaction.reply({
-      content: '👀 **Vorschau der Willkommensnachricht:**',
+      content: '**Vorschau der Willkommensnachricht:**',
       embeds: [embed],
       ephemeral: true
     });
@@ -66,7 +77,7 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.once('ready', async () => {
-  console.log(`✅ Bot ist online als ${client.user.tag}`);
+  console.log(`Bot ist online als ${client.user.tag}`);
   await registerCommands();
 });
 
